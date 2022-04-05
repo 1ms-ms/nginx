@@ -1,0 +1,20 @@
+- name: Gather facts
+  hosts: "all"
+  ignore_errors: yes
+- name: Create db
+  hosts: _Function_Database
+  roles:
+    - { role: maria_db, become: true }
+    - { role: node_exporter, become: true }
+- name: Install nginx 
+  hosts: _Function_Nginx
+  become: true
+  roles:
+    - { role: nginx, become: true }
+    - { role: node_exporter, become: true }
+- name: Flask app
+  hosts: _Function_EC
+  become: true
+  roles:
+    - { role: node_exporter, become: true }
+    - { role: server, become: true }      

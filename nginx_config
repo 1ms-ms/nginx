@@ -1,0 +1,16 @@
+events {}
+http {
+    upstream myapp1 {
+        server 10.10.20.98:5000;
+        server 10.10.20.139:5000;
+    }
+
+    server {
+        listen 5000;
+	allow 192.168.1.10;
+	deny all;
+        location / {
+            proxy_pass http://myapp1;
+        }
+    }
+}
