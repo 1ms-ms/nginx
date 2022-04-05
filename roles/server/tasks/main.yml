@@ -1,0 +1,32 @@
+- name: Copy files from host
+  copy: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+    - { src: '/home/ms/copy_folder/requirements.txt', dest: '/home/ec2-user/requirements.txt' }
+    - { src: '/home/ms/copy_folder/notes_mysql.py', dest: '/home/ec2-user/notes_mysql.py' }
+- name: Install the latest version of pip
+  yum:
+    name: python-pip
+    state: latest
+- name: Install requirements.txt
+  pip:
+    requirements: /home/ec2-user/requirements.txt
+    executable: pip3
+- name: Create my_config.conf file
+  template:
+    src: ./roles/server/templates/template.j2
+    dest: /home/ec2-user/my.conf  
+- name: Install nodejs
+  register: nodejs_status
+  failed_when: nodejs_status == 0
+  shell:  |
+    curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
+    sudo yum -y install nodejs
+- name: Install PM2
+  failed_when: nodejs_status == 0
+  shell: sudo npm install pm2@latest -g
+- name: check if flask app runs 
+  shell: sudo netstat -tulnp | grep :5000
+  register: flask_status  
+- name: start flask
+  shell: sudo pm2 start notes_mysql.py --interpreter python3
+  failed_when: flask_status == 0

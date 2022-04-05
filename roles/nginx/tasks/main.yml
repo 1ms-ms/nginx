@@ -1,0 +1,14 @@
+- name: install updates
+  yum: name=* state=latest
+- name: enable nginx 
+  command: amazon-linux-extras enable nginx1
+- name: install nginx
+  become: true
+  yum: name=nginx state=latest
+- name: Copy files from host
+  copy: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+    - { src: '/home/ms/nginx/nginx_config', dest: '/etc/nginx/nginx.conf' }
+- name: starting nginx
+  become: true
+  service: name=nginx state=started
