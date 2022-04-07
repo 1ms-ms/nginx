@@ -18,3 +18,8 @@
   roles:
     - { role: node_exporter, become: true }
     - { role: server, become: true }      
+- name: Install and configure monitoring
+  hosts: _Function_Monitoring
+  become: true
+  roles:
+    - role: monitoring

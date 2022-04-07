@@ -1,6 +1,6 @@
 plugin: aws_ec2
-aws_access_key: "{{AWS_ACCESS_KEY_ID}}"
-aws_secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
+aws_access_key: 
+aws_secret_key: 
 regions:
   - eu-west-1
 filters:
@@ -8,6 +8,7 @@ filters:
   - Nginx
   - EC
   - Database
+  - Monitoring
 keyed_groups:
   - prefix: ""
     key: tags

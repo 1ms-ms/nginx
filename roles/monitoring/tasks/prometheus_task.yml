@@ -1,0 +1,68 @@
+- name: Create "prometheus" group
+  group:
+    name: prometheus1
+    state: present
+- name: Add ec2-user to the group
+  user:
+    name: ec2-user
+    group: prometheus1
+- name: Creates directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: ec2-user
+    group: prometheus1
+    mode: 0775
+  loop:
+    - /etc/prometheus
+    - /var/lib/prometheus 
+- name: Install prometheus
+  get_url:
+    url: https://github.com/prometheus/prometheus/releases/download/v2.14.0/prometheus-2.14.0.linux-amd64.tar.gz
+    dest: /tmp
+- name: unarchive 
+  unarchive:
+    remote_src: yes
+    src: /tmp/prometheus-2.14.0.linux-amd64.tar.gz
+    dest: /tmp
+- name: Copy files prom /tmp
+  copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }} remote_src=yes group=prometheus1
+  with_items:
+    - { src: '/tmp/prometheus-2.14.0.linux-amd64/prometheus', dest: '/usr/local/bin/prometheus', mode: +x }  
+    - { src: '/tmp/prometheus-2.14.0.linux-amd64/tsdb', dest: '/var/lib/prometheus/tsdb', mode: -rw-r--r-- }  
+    - { src: '/tmp/prometheus-2.14.0.linux-amd64/promtool', dest: '/usr/local/bin/', mode: -rw-r--r-- }  
+    - { src: '/tmp/prometheus-2.14.0.linux-amd64/consoles', dest: '/etc/prometheus', mode: -rw-r--r-- }    
+    - { src: '/tmp/prometheus-2.14.0.linux-amd64/console_libraries', dest: '/etc/prometheus', mode: -rw-r--r-- }    
+- name: Check if file exists
+  file: 
+    path: /etc/prometheus/prometheus.yml
+    state: touch
+- name: Check if file exists
+  file: 
+    path: /etc/systemd/system/prometheus.service
+    state: touch
+- name: Copy files from host
+  copy: src={{ item.src }} dest={{ item.dest }} group=prometheus1
+  with_items:
+    - { src: '/home/ms/nginx/prometheus.yml', dest: '/etc/prometheus/prometheus.yml' }
+    - { src: '/home/ms/nginx/prometheus.service', dest: '/etc/systemd/system/prometheus.service' }
+- name: Reload daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+- name: start prometheus
+  systemd:
+    state: started
+    name: prometheus
+  become: true
+# - name: starting prometheus
+#   shell: sudo -u ec2-user /usr/local/bin/prometheus \
+#     --config.file /etc/prometheus/prometheus.yml \
+#     --storage.tsdb.path /var/lib/prometheus/ \
+#     --web.console.templates=/etc/prometheus/consoles \
+#     --web.console.libraries=/etc/prometheus/console_libraries  
+
+# - name: Install grafana
+#   get_url:
+#     url: https://packages.grafana.com/enterprise/rpm
+#     dest: /home/ec2-user/

@@ -4,7 +4,7 @@ resource "aws_instance" "myec2" {
    instance_type = "t2.micro"
    key_name = "ansible"
    subnet_id = aws_subnet.private_subnet.id
-   vpc_security_group_ids = [aws_security_group.sg.id, ]
+   vpc_security_group_ids = [aws_security_group.sg_monitor.id, ]
    tags = {
      Name = element(var.instance_tags, count.index)
      Function = element(var.instance_functions, count.index)
@@ -30,7 +30,7 @@ resource "aws_instance" "myec2_nginx" {
    instance_type = "t2.micro"
    key_name = "ansible"
    subnet_id = aws_subnet.public_subnet.id
-   vpc_security_group_ids = [aws_security_group.sg.id, ]
+   vpc_security_group_ids = [aws_security_group.sg_nginx.id, ]
    tags = {
      Name = "Nginx"
      Function = "Nginx"

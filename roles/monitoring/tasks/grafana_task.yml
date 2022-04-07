@@ -1,0 +1,22 @@
+- name: Check if file exists
+  file: 
+    path: /etc/yum.repos.d/grafana.repo
+    state: touch
+- name: Copy config 
+  copy:
+    src: '/home/ms/nginx/grafana_config'
+    dest: '/etc/yum.repos.d/grafana.repo'
+- name: install grafana
+  yum:
+    name: grafana
+    state: present
+- name: Reload daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+- name: start grafana
+  systemd:
+    state: started
+    name: grafana-server
+    enabled: true
+  become: true    

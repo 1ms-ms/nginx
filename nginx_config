@@ -1,16 +1,26 @@
 events {}
 http {
     upstream myapp1 {
-        server 10.10.20.98:5000;
-        server 10.10.20.139:5000;
+        server 10.10.20.204:5000;
+        server 10.10.20.21:5000;
     }
-
+    upstream myapp2 {
+        server 	10.10.20.7:9090;
+    }
     server {
         listen 5000;
-	allow 192.168.1.10;
+	allow ;
 	deny all;
         location / {
             proxy_pass http://myapp1;
+        }
+    }
+    server {
+        listen 9090;
+    allow ;
+	deny all;    
+        location / {
+            proxy_pass http://myapp2;
         }
     }
 }

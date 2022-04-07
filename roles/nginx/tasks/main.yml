@@ -11,4 +11,4 @@
     - { src: '/home/ms/nginx/nginx_config', dest: '/etc/nginx/nginx.conf' }
 - name: starting nginx
   become: true
-  service: name=nginx state=started
+  service: name=nginx state=reloaded

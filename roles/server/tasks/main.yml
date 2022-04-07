@@ -27,6 +27,7 @@
 - name: check if flask app runs 
   shell: sudo netstat -tulnp | grep :5000
   register: flask_status  
+  failed_when: flask_status == 0
 - name: start flask
   shell: sudo pm2 start notes_mysql.py --interpreter python3
   failed_when: flask_status == 0
